@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 import board
 import displayio
 import framebufferio
@@ -9,6 +11,7 @@ import socketpool
 # import ssl
 import terminalio
 import time
+import traceback
 import wifi
 
 from adafruit_bitmap_font import bitmap_font
@@ -35,20 +38,22 @@ matrix = rgbmatrix.RGBMatrix(
 fb = framebufferio.FramebufferDisplay(matrix, auto_refresh=True)
 
 display_group = displayio.Group()
+empty_group = displayio.Group()
+display_on = True
 
 tiny_font = bitmap_font.load_font("fonts/4x6.bdf", Bitmap)
 
-# Don't change these two...
+# Don't change these...
 BASE_TOPIC = os.getenv('MQTT_BASE_TOPIC')
 URGENT_TOPIC = BASE_TOPIC + "urgent"
+DISPLAY_TOPIC = BASE_TOPIC + "display"
 
+# Customise these as you like...
 TIME_TOPIC = BASE_TOPIC + "time_hhmm"
 DATE_TOPIC = BASE_TOPIC + "time_date"
 OFFTEMP_TOPIC = BASE_TOPIC + "office_temp"
 OUTTEMP_TOPIC = BASE_TOPIC + "outside_temp"
 GBPEUR_TOPIC = BASE_TOPIC + "gbpeur"
-
-# NEWS_TOPIC = BASE_TOPIC + "uk_news"
 
 info = {
     # MQTT        : [prefix, x, y, fg_col, font, scale]
@@ -72,14 +77,9 @@ for key in info:
 
 fb.show(display_group)
 
-wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
-    
-print("DEBUG: WiFi connected")
-time.sleep(2)
-pool = socketpool.SocketPool(wifi.radio)
-
 def connected_cb(client, userdata, flags, rc):
     print("DEBUG: MQTT connected to broker")
+    client.subscribe(DISPLAY_TOPIC)
     for key in info:
         print("DEBUG: About to subscribe to: >>>" + key + "<<<")
         client.subscribe(key, 0)
@@ -88,35 +88,50 @@ def subscribed_cb(client, userdata, topic, granted_qos):
     print('DEBUG: Subscribed to {0} with QOS level {1}'.format(topic, granted_qos))
 
 def message_cb(client, topic, message):
-    print("DEBUG: MQTT got topic: {0}, payload: {1}".format(topic, message))
+    global display_on
+    if constants.VERBOSE:
+        print("DEBUG: MQTT got topic: {0}, payload: {1}".format(topic, message))
     if topic in labels:
         labels[topic].text = info[topic][0] + message
+    elif topic == DISPLAY_TOPIC:
+        if message == "Off":
+            display_on = False
+            fb.show(empty_group)
+        elif message == "On":
+            display_on = True
+            fb.show(display_group)
+        else:
+            print("WARNING: Unknow display control message: " + message)
     else:
         return
     gc.collect()
-    fb.show(display_group)
-
-mqtt_client = MQTT.MQTT (
-    broker = os.getenv('MQTT_BROKER'),
-    port = os.getenv('MQTT_PORT'),
-    client_id = os.getenv('MQTT_CLIENT_ID'),
-    username = os.getenv('MQTT_USERNAME'),
-    password = os.getenv('MQTT_PASSWORD'),
-    socket_pool = pool,
-    # ssl_context=ssl.create_default_context(),
-)
-mqtt_client.on_connect = connected_cb
-mqtt_client.on_subscribe = subscribed_cb
-mqtt_client.on_message = message_cb
-print("Attempting to connect to %s" % mqtt_client.broker)
-mqtt_client.connect()
-
-# mqtt_client.disconnect()
-# print("DEBUG: disconnected from MQTT")
-
-blink_state = False
+    if display_on:
+       fb.show(display_group)
 
 try:
+   while wifi.radio.ipv4_address == None:
+      print("DEBUG: Connecting to WiFi")
+      wifi.radio.connect(os.getenv('WIFI_SSID'), os.getenv('WIFI_PASSWORD'))
+      time.sleep(1)
+      
+   print("DEBUG: WiFi connected")
+   pool = socketpool.SocketPool(wifi.radio)
+   mqtt_client = MQTT.MQTT (
+      broker = os.getenv('MQTT_BROKER'),
+      port = os.getenv('MQTT_PORT'),
+      client_id = os.getenv('MQTT_CLIENT_ID'),
+      username = os.getenv('MQTT_USERNAME'),
+      password = os.getenv('MQTT_PASSWORD'),
+      socket_pool = pool,
+   )
+   mqtt_client.on_connect = connected_cb
+   mqtt_client.on_subscribe = subscribed_cb
+   mqtt_client.on_message = message_cb
+
+   print("Attempting to connect to %s" % mqtt_client.broker)
+   mqtt_client.connect()
+
+   blink_state = False
    while True:
       mqtt_client.loop()
       blink_state = not blink_state
@@ -130,9 +145,10 @@ try:
 
       # news_label.update()
       time.sleep(1.0)
+
 except Exception as e:
-    print("Error:\n", str(e))
-    print("Resetting in 10 seconds")
-    time.sleep(10)
-    microcontroller.reset()
+    print("ERROR:\n", str(e))
+#     print("Resetting in 10 seconds...")
+#     time.sleep(10)
+#     microcontroller.reset()
     
