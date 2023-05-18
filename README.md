@@ -2,9 +2,10 @@
 MQTT fed RGB LED Panel via Raspberry Pico W
 
 ```mermaid
-flowchart TD
-    A[Internet] <-->| | B[Node-Red]
-    B <-->| |D[Intranet]
-    B -->| |C{MQTT Broker}
-    C <-->| |E[PicoPanel]
+flowchart LR
+    I[Internet] --- | | R[Node-Red]
+    L[LAN] --- R
+    Z[Zigbee2MQTT] --- M
+    R ---| |M((MQTT Broker))
+    M ---| |P[PicoPanel]
 ```
