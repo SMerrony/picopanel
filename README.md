@@ -1,5 +1,6 @@
 # picopanel
 MQTT fed RGB LED Panel via Raspberry Pico W
+![Screenshot](PicoPanel20230519.jpg)
 
 ```mermaid
 flowchart LR
