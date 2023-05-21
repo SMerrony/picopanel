@@ -41,7 +41,8 @@ display_group = displayio.Group()
 empty_group = displayio.Group()
 display_on = True
 
-tiny_font = bitmap_font.load_font("fonts/4x6.bdf", Bitmap)
+font_4_6 = bitmap_font.load_font("fonts/4x6.bdf", Bitmap)
+font_3_5 = bitmap_font.load_font("fonts/tiny3x5.bdf", Bitmap)
 
 # Don't change these...
 BASE_TOPIC = os.getenv('MQTT_BASE_TOPIC')
@@ -55,13 +56,17 @@ OFFTEMP_TOPIC = BASE_TOPIC + "office_temp"
 OUTTEMP_TOPIC = BASE_TOPIC + "outside_temp"
 GBPEUR_TOPIC = BASE_TOPIC + "gbpeur"
 
+# No data for these...
+# DUMMY1 = "dummy1"
+
 info = {
     # MQTT        : [prefix, x, y, fg_col, font, scale]
     TIME_TOPIC    : ["", 3, 8, 0xffff00, "builtin", 2],
     DATE_TOPIC    : ["", 2, 22, 0xff44ff, "builtin", 1],
-    OFFTEMP_TOPIC : ["Temp ", 5, 31, 0xff0000, "tiny", 1],
-    OUTTEMP_TOPIC : ["/ ", 43, 31, 0xff0000, "tiny", 1],
-    GBPEUR_TOPIC  : ["", 8, 38, 0xff55ee, "tiny", 1],
+    OFFTEMP_TOPIC : ["", 9, 33, 0xff0000, "3x5", 1],
+    OUTTEMP_TOPIC : ["°C / ", 27, 33, 0xff0000, "3x5", 1],
+    GBPEUR_TOPIC  : ["", 8, 39, 0xff55ee, "3x5", 1],
+    # DUMMY1        : ["1234567890123456", 0, 44, 0xffffff, "3x5", 1],
     URGENT_TOPIC  : ["", 0, 52, 0xffff00, "builtin", 2],
 }
 
@@ -70,8 +75,10 @@ for key in info:
     d = info[key]
     if d[4] == "builtin":
         t_font = terminalio.FONT
+    elif d[4] == "3x5":
+        t_font = font_3_5
     else:
-        t_font = tiny_font
+        t_font = font_4_6
     labels[key] = Label(font=t_font, text=d[0], x=d[1], y=d[2], background_color=0, color=d[3], scale=d[5])
     display_group.append(labels[key])
 
@@ -142,13 +149,11 @@ try:
          else:
                labels[URGENT_TOPIC].color = info[URGENT_TOPIC][3]
                fb.show(display_group)
-
-      # news_label.update()
       time.sleep(1.0)
 
 except Exception as e:
     print("ERROR:\n", str(e))
-#     print("Resetting in 10 seconds...")
-#     time.sleep(10)
-#     microcontroller.reset()
+    print("Resetting in 10 seconds...")
+    time.sleep(10)
+    microcontroller.reset()
     
