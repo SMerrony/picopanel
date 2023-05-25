@@ -1,0 +1,256 @@
+[
+    {
+        "id": "87010f85486f3035",
+        "type": "mqtt out",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "topic": "rgbmatrix/gbpeur",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "fb4e4d64.1c3728",
+        "x": 830,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "260f831f6f2271f1",
+        "type": "inject",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "3600",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 130,
+        "y": 1700,
+        "wires": [
+            [
+                "e2c1d71f7bdc179b"
+            ]
+        ]
+    },
+    {
+        "id": "e2c1d71f7bdc179b",
+        "type": "stock-request",
+        "z": "7e32efb6.7318a",
+        "name": "Yahoo FX",
+        "tickers": "GBPEUR=X",
+        "x": 320,
+        "y": 1700,
+        "wires": [
+            [
+                "ecff37107b3ba9a6"
+            ]
+        ]
+    },
+    {
+        "id": "ecff37107b3ba9a6",
+        "type": "function",
+        "z": "7e32efb6.7318a",
+        "name": "Extract Rate",
+        "func": "msg.payload = \"GBPEUR: \" + msg.payload.price.toPrecision(3);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 1700,
+        "wires": [
+            [
+                "87010f85486f3035"
+            ]
+        ]
+    },
+    {
+        "id": "0f109174fa4dab45",
+        "type": "ui_switch",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "label": "LED Matrix",
+        "tooltip": "",
+        "group": "ee21b06d.81921",
+        "order": 2,
+        "width": "2",
+        "height": "1",
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "On",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "Off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "animate": false,
+        "className": "",
+        "x": 130,
+        "y": 1780,
+        "wires": [
+            [
+                "26822c5347dfcc82",
+                "914c15b34f3812fd"
+            ]
+        ]
+    },
+    {
+        "id": "26822c5347dfcc82",
+        "type": "mqtt out",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "topic": "rgbmatrix/control1",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "fb4e4d64.1c3728",
+        "x": 530,
+        "y": 1780,
+        "wires": []
+    },
+    {
+        "id": "e083b9883795439b",
+        "type": "inject",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "15 07 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "On",
+        "payloadType": "str",
+        "x": 130,
+        "y": 1840,
+        "wires": [
+            [
+                "26822c5347dfcc82",
+                "914c15b34f3812fd"
+            ]
+        ]
+    },
+    {
+        "id": "135b2e93b0acfa8f",
+        "type": "inject",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "30 23 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Off",
+        "payloadType": "str",
+        "x": 130,
+        "y": 1880,
+        "wires": [
+            [
+                "26822c5347dfcc82",
+                "914c15b34f3812fd"
+            ]
+        ]
+    },
+    {
+        "id": "914c15b34f3812fd",
+        "type": "mqtt out",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "topic": "rgbmatrix/control2",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "fb4e4d64.1c3728",
+        "x": 530,
+        "y": 1840,
+        "wires": []
+    },
+    {
+        "id": "fb4e4d64.1c3728",
+        "type": "mqtt-broker",
+        "name": "Local MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "compatmode": false,
+        "protocolVersion": 4,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "ee21b06d.81921",
+        "type": "ui_group",
+        "name": "Ceiling Lamp & Matrix",
+        "tab": "83606bf6.b32388",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "83606bf6.b32388",
+        "type": "ui_tab",
+        "name": "Steve",
+        "icon": "dashboard",
+        "order": 6,
+        "disabled": false,
+        "hidden": false
+    }
+]

@@ -1,0 +1,143 @@
+[
+    {
+        "id": "1e6a10db8cf8afcf",
+        "type": "inject",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "030",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1940,
+        "wires": [
+            [
+                "6bf3912b65cff5b1"
+            ]
+        ]
+    },
+    {
+        "id": "6bf3912b65cff5b1",
+        "type": "simpletime",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "mydate": true,
+        "myymd": false,
+        "myyear": false,
+        "mymonth": false,
+        "mymonthn": false,
+        "mydom": false,
+        "mydoy": false,
+        "myday": false,
+        "myhourpm": false,
+        "myhour": false,
+        "mytime": true,
+        "mytimes": false,
+        "myminute": false,
+        "myminutes": false,
+        "mysecond": false,
+        "mymillis": false,
+        "myepoch": false,
+        "myrawdate": false,
+        "mypm": false,
+        "x": 310,
+        "y": 1940,
+        "wires": [
+            [
+                "e58ef0801040f5d1",
+                "96ed91768bbc3da4"
+            ]
+        ]
+    },
+    {
+        "id": "e58ef0801040f5d1",
+        "type": "function",
+        "z": "7e32efb6.7318a",
+        "name": "Time",
+        "func": "msg.payload = msg.mytime;\nmsg.topic = \"rgbmatrix/time_hhmm\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1920,
+        "wires": [
+            [
+                "86694881b20d9208"
+            ]
+        ]
+    },
+    {
+        "id": "96ed91768bbc3da4",
+        "type": "function",
+        "z": "7e32efb6.7318a",
+        "name": "Date",
+        "func": "msg.payload = msg.mydate;\nmsg.topic = \"rgbmatrix/time_date\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1960,
+        "wires": [
+            [
+                "86694881b20d9208"
+            ]
+        ]
+    },
+    {
+        "id": "86694881b20d9208",
+        "type": "mqtt out",
+        "z": "7e32efb6.7318a",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "fb4e4d64.1c3728",
+        "x": 650,
+        "y": 1940,
+        "wires": []
+    },
+    {
+        "id": "fb4e4d64.1c3728",
+        "type": "mqtt-broker",
+        "name": "Local MQTT Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "compatmode": false,
+        "protocolVersion": 4,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]
