@@ -1,7 +1,12 @@
 # picopanel
 MQTT fed RGB LED Panel via Raspberry Pico W
 
-This repo contains the CircuitPython code (easily customisable), design and 3D files for a rear stand-off (P3 panel size), and some very efficient fonts.
+This repo contains...
+ * CircuitPython PicoPanel code (easily customisable)
+ * Some very efficient fonts
+ * Sample Node-RED flows for sending information to PicoPanel
+ * Design and 3D files for a rear stand-off (P3 panel size)
+  
 ![Screenshot](PicoPanel20230522.jpg)
 
 ```mermaid
@@ -14,10 +19,30 @@ flowchart LR
 ```
 
 ## Usage Notes
-MQTT messages on your BASE_TOPIC (set in config.py) wil be available to all picopanels that subscribe to them.
+
+### Layout Definition
+The `config.py` file defines the information that is displayed on your panel.
+
+For each live field you want displayed you should define a `<name>_TOPIC` variable and add a 
+corresponding line to the `info` dict.
+
+The format of the `info` elements is...
+
+`<topic_name> : ["<prefix>", <x>, <y>, 0x<rrggbb>, "<font_alias>", <scale_factor>]`
+
+* <topic_name> is a variable you previously set to the MQTT topic (see above)
+* <prefix> is an optional string displayed before the MQTT payload
+* <x> is the x ordinate of the start of the displayed item
+* <y> is the y ordinate of the middle of the displayed item
+* 0x<rrggbb> is the colour of the item in hex format
+* <font_alias> is one of the known fonts, currently: `builtin`, `3x5`, and `4x6`
+* <scale_factor> is a positive integer specifying how much the font is enlarged
+
+### MQTT
+MQTT messages on your BASE_TOPIC (set in `config.py`) wil be available to all picopanels that subscribe to them.
 
 Set a unique DISPLAY_ID (a string) for each picopanel on your network.
-This is used as the suffix of the CONTROL_TOPIC (`control`) to permit actions like turning a display on or off.
+This is used as the suffix of the CONTROL_TOPIC (`control`) to permit actions like turning a specific display on or off.
 
 Eg. To turn off a display using the sample config send an `Off` payload to the `rgbmatrix/control1` topic.
 
