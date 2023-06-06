@@ -90,6 +90,11 @@ def message_cb(client, topic, message):
         elif message == "On":
             display_on = True
             fb.show(display_group)
+        elif message == "GetConfig":
+            conf_file = open("config.py")
+            conf = conf_file.read()
+            conf_file.close()
+            mqtt_client.publish(config.STATUS_TOPIC, "RECONFIGURE\n" + conf + "\nEOF\n")
         elif message.startswith("RECONFIGURE\n"):
             if not message.endswith("EOF\n"):
                 print("WARNING: RECONFIGURE payload seems incomplete - ignoring")

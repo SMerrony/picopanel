@@ -52,7 +52,13 @@ Eg. To alert viewer to a doorbell you could send `Door!` to the `rgbmatrix/urgen
 to send an empty message after some time has elapsed.
 
 ### Reconfigure-via-MQTT
-To replace the `config.py` file on the fly, send a new version to the panel's control topic with the following format...
+You can reconfigure PicoPanel wirelessly via MQTT.
+
+There are two `control` messages to facilitate this:
+
+A payload of `GetConfig` will cause PicoPanel to send the contents of the current `config.py` file on the `status1` topic.  It is handily prefixed and suffixed with the header and trailer needed for actual reconfiguration.
+
+To perform the reconfiguration send the new contents of `config.py` to the panel's control topic with the following format...
 ```
 RECONFIGURE
 <file-contents>

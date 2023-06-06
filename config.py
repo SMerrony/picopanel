@@ -10,12 +10,13 @@ BIT_DEPTH = 2    # This significantly affects performance and flicker
 VERBOSE = True
 
 BASE_TOPIC = "rgbmatrix/" # probably the same for all your displays
-DISPLAY_ID = "2"          # unique per display
+DISPLAY_ID = "1"          # unique per display
 
 # Don't change these...
 # 
 URGENT_TOPIC = BASE_TOPIC + "urgent"
 CONTROL_TOPIC = BASE_TOPIC + "control"+ DISPLAY_ID
+STATUS_TOPIC = BASE_TOPIC + "status" + DISPLAY_ID
 
 # Customise these as you like...
 TIME_TOPIC = BASE_TOPIC + "time_hhmm"
